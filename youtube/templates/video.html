@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Video Library</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src= "https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> 
+    <script src= "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+
+    <style> 
+        .bs-example { 
+            margin: 20px; 
+        } 
+        .modal-content iframe { 
+            margin: 0 auto; 
+            display: block; 
+        } 
+        input[type=text] {
+        width: 130px;
+        box-sizing: border-box;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+        background-color: white;
+        background-image: url('searchicon.png');
+        background-position: 10px 10px; 
+        background-repeat: no-repeat;
+        padding: 12px 20px 12px 40px;
+        -webkit-transition: width 0.4s ease-in-out;
+        transition: width 0.4s ease-in-out;
+        }
+        input[type=text]:focus {
+            width: 100%;
+        }
+    </style>
+    
+    <script> 
+        $(document).ready(function() { 
+            $("#modal_page").on('hide.bs.modal', function() { 
+                $("#modal_video").attr('src', ''); 
+            }); 
+            $("#modal_page").on('show.bs.modal', function(event) {
+                let $target = $(event.relatedTarget);   
+                let video = $target.data("video-id")
+                let video_name = $target.data("video-name")
+                let url = "https://www.youtube.com/embed/" + video
+                $("#modal_video").attr('src', url); 
+            }); 
+        });
+        function addState() { 
+            window.location.href =  window.location.href.split("?")[0];
+        }  
+    </script>
+</head>
+<body>
+    <center> 
+        <h1 style="color:rgb(34, 134, 138)">   
+            <button onclick="addState()"> Welcome to Video Library! </button>
+        </h1> 
+        <div class="container my-4">
+            <form action="{% url 'search_results' %}" method="get">
+                <input name="search" type="text" placeholder="Search...">
+            </form>
+            <div class="row">
+                {% for video in videos %}
+                <div class="col-md-4">
+                    <div class="thumbnail">
+                        <img src="{{ video.thumbnail.url }}"  data-toggle="modal" data-target="#modal_page" data-video-id="{{ video.url_id }}" 
+                            data-video-name="{{ video.name }}">
+                        <div class="text-center ">
+                            <p>{{video.name}}</p>    
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </center> 
+    <!--Modal: Name-->
+    <div class="modal fade" id="modal_page" role="dialog">
+        <div class="modal-dialog">
+
+            <!--Content-->
+            <div class="modal-content">
+                <!--Header-->
+                <div class="modal-header"> 
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button> 
+                    <h4 class="modal-title"></h4> 
+                </div> 
+                <!--Body-->
+                <div class="modal-body">
+                    <div class="embed-responsive embed-responsive-16by9 z-depth-1-half">
+                        <iframe  id="modal_video" class="embed-responsive-item" src="https://www.youtube.com/embed/{{ video.url_id }}"
+                        allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
